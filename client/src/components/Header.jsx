@@ -2,6 +2,8 @@ import { Navbar, TextInput, Button } from 'flowbite-react';
 import { Link, useLocation } from 'react-router-dom';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaMoon } from 'react-icons/fa';
+import { FaBasketball } from "react-icons/fa6";
+
 
 export default function Header() {
   const path = useLocation().pathname;
@@ -20,7 +22,10 @@ export default function Header() {
         className="flex items-center whitespace-nowrap text-md font-semibold dark:text-white"
         aria-label="Basketball Blog Homepage"
       >
-        <span className="px-2 py-1 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
+        <span className="px-2 py-1 md:hidden bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
+          <FaBasketball className="w-5 h-5" />
+        </span>
+        <span className="hidden md:inline px-2 py-1 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
           Basketball
         </span>
         Blog

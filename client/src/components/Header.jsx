@@ -2,7 +2,7 @@ import { Navbar, TextInput, Button } from 'flowbite-react';
 import { Link, useLocation } from 'react-router-dom';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaMoon } from 'react-icons/fa';
-import { FaBasketball } from "react-icons/fa6";
+import { IoIosFitness } from "react-icons/io";
 
 
 export default function Header() {
@@ -20,15 +20,15 @@ export default function Header() {
       <Link
         to="/"
         className="flex items-center whitespace-nowrap text-md font-semibold dark:text-white"
-        aria-label="Basketball Blog Homepage"
+        aria-label="My Workout Collection Homepage"
       >
         <span className="px-2 py-1 md:hidden bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
-          <FaBasketball className="w-5 h-5" />
+          <IoIosFitness className="w-5 h-5" />
         </span>
         <span className="hidden md:inline px-2 py-1 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
-          Basketball
+          Jimmy's Workout
         </span>
-        Blog
+        Collection
       </Link>
 
       {/* Search Bar */}
@@ -77,7 +77,7 @@ export default function Header() {
             className={`text-center py-2 ${path === link.to
               ? 'text-orange-500'
               : 'text-gray-700'
-              } hover:bg-orange-500 hover:text-white`}
+              } hover:bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 hover:text-white`}
           >
             <Link
               to={link.to}

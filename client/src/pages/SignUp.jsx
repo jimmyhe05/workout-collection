@@ -44,9 +44,8 @@ export default function SignUp() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error("Signup failed. Please try again");
+        throw new Error(data.message || "Signup failed. Please try again.");
       }
-
       setLoading(false);
       navigate("/sign-in");
     } catch (err) {

@@ -6,28 +6,26 @@ import authRoutes from "./routes/auth.route.js";
 
 dotenv.config();
 
+const app = express();
+app.use(express.json()); // Middleware to parse JSON requests
+
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO)
-  .then(() => {
-    console.log("Connected to the database!");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+  .then(() => console.log("Connected to the database!"))
+  .catch((err) => console.error("Database connection error:", err));
 
-const app = express();
-
-app.use(express.json());
-
-app.listen(3000, () => {
-  console.log("Server is running on port 3000!");
-});
-
+// Routes
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 
+// Error handling middleware
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  res.status(statusCode).json({ success: false, statusCode, message });
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "Server Error" });
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running on port ${process.env.PORT || 3000}!`);
 });

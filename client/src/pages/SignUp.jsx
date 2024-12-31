@@ -1,58 +1,172 @@
-import React from 'react'
-import { IoIosFitness } from 'react-icons/io'
-import { Label, TextInput, Button } from 'flowbite-react'
-import { Link } from 'react-router-dom'
+import { IoIosFitness } from "react-icons/io";
+import { Label, TextInput, Button, Alert, Spinner } from "flowbite-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function SignUp() {
+  const [formData, setFormData] = useState({
+    email: "",
+    username: "",
+    password: "",
+  });
+  const [errorMsg, setErrorMsg] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+    setErrorMsg({ ...errorMsg, [e.target.id]: "" }); // Clear error on input change
+  };
+
+  const validateFields = () => {
+    let errors = {};
+    if (!/\S+@\S+\.\S+/.test(formData.email))
+      errors.email = "Please enter a valid email address.";
+    if (formData.username.length < 3)
+      errors.username = "Username must be at least 3 characters long.";
+    if (formData.password.length < 6)
+      errors.password = "Password must be at least 6 characters.";
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errors = validateFields();
+    if (Object.keys(errors).length > 0) return setErrorMsg(errors);
+
+    try {
+      setLoading(true);
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error("Signup failed. Please try again");
+      }
+
+      setLoading(false);
+      navigate("/sign-in");
+    } catch (err) {
+      setErrorMsg({ form: err.message });
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen mt-20">
-      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5">
-        {/* left side */}
-        <div className='flex-1'>
-          <Link
-            to="/"
-            className="flex items-center whitespace-nowrap text-md font-bold dark:text-white text-4xl"
-            aria-label="My Workout Collection Homepage"
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 bg-[length:200%_200%] animate-gradient p-5">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex justify-center items-center text-2xl font-bold mb-5"
+        >
+          <IoIosFitness className="text-orange-500 w-8 h-8" />
+          <span className="ml-2 text-gray-700 dark:text-white">
+            My Workout Collection
+          </span>
+        </Link>
+
+        {/* Form */}
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <Label value="Email" />
+            <TextInput
+              type="text"
+              placeholder="Enter your email"
+              id="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`${
+                errorMsg.email ? "border-red-500 focus:ring-red-500" : ""
+              }`}
+              aria-invalid={!!errorMsg.email}
+              aria-live="polite"
+            />
+            {errorMsg.email && (
+              <Alert color="failure" className="mt-2">
+                {errorMsg.email}
+              </Alert>
+            )}
+          </div>
+
+          <div>
+            <Label value="Username" />
+            <TextInput
+              type="text"
+              placeholder="Choose a username"
+              id="username"
+              value={formData.username}
+              onChange={handleChange}
+              className={`${
+                errorMsg.username ? "border-red-500 focus:ring-red-500" : ""
+              }`}
+              aria-invalid={!!errorMsg.username}
+              aria-live="polite"
+            />
+            {errorMsg.username && (
+              <Alert color="failure" className="mt-2">
+                {errorMsg.username}
+              </Alert>
+            )}
+          </div>
+
+          <div>
+            <Label value="Password" />
+            <TextInput
+              type="password"
+              placeholder="Create a password"
+              id="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`${
+                errorMsg.password ? "border-red-500 focus:ring-red-500" : ""
+              }`}
+              aria-invalid={!!errorMsg.password}
+              aria-live="polite"
+            />
+            {errorMsg.password && (
+              <Alert color="failure" className="mt-2">
+                {errorMsg.password}
+              </Alert>
+            )}
+          </div>
+
+          <Button
+            gradientDuoTone="pinkToOrange"
+            type="submit"
+            className="w-full"
+            disabled={loading}
           >
-            <span className="px-2 py-1 md:hidden bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
-              <IoIosFitness className="w-8 h-8" />
-            </span>
-            <span className="hidden md:inline px-2 py-1 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
-              Jimmy's Workout
-            </span>
-            Collection
-          </Link>
-          <p className="text-sm mt-5">
-            <b>Welcome to My Workout Collection</b>
-            <br />
-            Here, I share my personal workout routines along with recommended videos and content from various fitness influencers. Whether you're looking for guidance or inspiration, My Workout Collection helps you stay motivated and track your progress effortlessly.
+            {loading ? (
+              <>
+                <Spinner size="sm" />
+                <span className="pl-3">Signing Up...</span>
+              </>
+            ) : (
+              "Join Now"
+            )}
+          </Button>
+
+          {errorMsg.form && (
+            <Alert color="failure" className="mt-3">
+              {errorMsg.form}
+            </Alert>
+          )}
+        </form>
+
+        {/* Footer */}
+        <div className="mt-4 text-center">
+          <p className="text-sm">
+            Already have an account?{" "}
+            <Link to="/sign-in" className="text-blue-500 hover:underline">
+              Sign In
+            </Link>
           </p>
         </div>
-        {/* right side */}
-        <div className="flex-1 flex-col gap-3">
-          <form className="flex flex-col gap-2">
-            <div className="">
-              <Label value="EMAIL" />
-              <TextInput type="text" placeholder='' id="email"></TextInput>
-            </div>
-            <div className="">
-              <Label value="USERNAME" />
-              <TextInput type="text" placeholder='' id="username"></TextInput>
-            </div>
-            <div className="mb-2">
-              <Label value="PASSWORD" />
-              <TextInput type="text" placeholder='' id="password"></TextInput>
-            </div>
-            <Button gradientDuoTone="pinkToOrange" type="submit">
-              Join My Workout
-            </Button>
-          </form>
-          <div className='flex gap-2 text-sm mt-5'>
-            <span>Have an account?</span>
-            <Link to="/sign-in" className='text-blue-500'>Sign In</Link>
-          </div>
-        </div>
       </div>
-    </div >
-  )
+    </div>
+  );
 }

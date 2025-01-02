@@ -69,7 +69,7 @@ export default function SignUp() {
         </Link>
 
         {/* Form */}
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-3" onSubmit={handleSubmit}>
           <div>
             <Label value="Email" />
             <TextInput

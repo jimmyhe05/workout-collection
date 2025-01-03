@@ -22,7 +22,7 @@ export default function Header() {
         aria-label="My Workout Collection Homepage"
       >
         <span className="px-2 py-1 md:hidden bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
-          <IoIosFitness className="w-6 h-5" />
+          <IoIosFitness className="w-6 h-6" />
         </span>
         <span className="hidden md:inline px-2 py-1 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-lg text-white">
           My Workout

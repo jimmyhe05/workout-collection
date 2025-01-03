@@ -55,7 +55,8 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 bg-[length:200%_200%] animate-gradient p-5">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 p-5">
+      {/* <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-200 via-yellow-100 to-white bg-[length:200%_200%] animate-gradient p-5"> */}
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
         {/* Logo */}
         <Link

@@ -30,7 +30,11 @@ export const signup = async (req, res) => {
     // Check for existing user
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
-      return errorResponse(res, 409, "Invalid credentials.");
+      return errorResponse(
+        res,
+        409,
+        "Email or username already exists. Please try another."
+      );
     }
 
     // Hash password
@@ -51,38 +55,64 @@ export const signup = async (req, res) => {
 
 // Signin functionality
 export const signin = async (req, res) => {
-  const { email, password } = req.body;
+  const { login, password } = req.body;
 
-  if (!email || !password) {
+  if (
+    !login ||
+    !password ||
+    typeof login !== "string" ||
+    typeof password !== "string"
+  ) {
     return errorResponse(res, 400, "All fields are required.");
   }
 
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return errorResponse(res, 404, "Invalid credentials.");
+    // Check if the user exists by email or username
+    const validUser = await User.findOne({
+      $or: [{ email: login }, { username: login }],
+    });
+    if (!validUser) {
+      return errorResponse(res, 404, "User not found.");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    // Validate the password
+    const validPassword = await bcrypt.compare(password, validUser.password);
+    if (!validPassword) {
       return errorResponse(res, 401, "Invalid credentials.");
     }
 
+    // Ensure JWT secret exists
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not defined in the environment variables.");
+      return errorResponse(res, 500, "Server configuration error.");
+    }
+
+    // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { email: validUser.email, id: validUser._id },
       process.env.JWT_SECRET,
       { expiresIn: "1m" }
     );
 
+    // Respond with a token and user details
     res
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
+        sameSite: "Strict",
         secure: process.env.NODE_ENV === "production",
       })
-      .json({ success: true, user: { id: user._id, username: user.username } });
+      .json({
+        success: true,
+        message: "Login successful.",
+        user: {
+          id: validUser._id,
+          username: validUser.username,
+          email: validUser.email,
+        },
+      });
   } catch (error) {
     console.error("Error during signin:", error);
-    errorResponse(res, 500, "Internal server error.");
+    errorResponse(res, 500, "Something went wrong. Please try again.");
   }
 };

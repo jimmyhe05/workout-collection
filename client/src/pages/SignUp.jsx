@@ -2,6 +2,7 @@ import { IoIosFitness } from "react-icons/io";
 import { Label, TextInput, Button, Alert, Spinner } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { HiEye, HiEyeOff } from "react-icons/hi";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -9,30 +10,60 @@ export default function SignUp() {
     username: "",
     password: "",
   });
-  const [errorMsg, setErrorMsg] = useState({});
+  const [errorMsg, setErrorMsg] = useState({
+    email: "",
+    username: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
-    setErrorMsg({ ...errorMsg, [e.target.id]: "" }); // Clear error on input change
+  const validateField = (field, value) => {
+    switch (field) {
+      case "email":
+        if (!/\S+@\S+\.\S+/.test(value)) {
+          return "Please enter a valid email address.";
+        }
+        break;
+      case "username":
+        if (value.length < 3) {
+          return "Username must be at least 3 characters long.";
+        }
+        break;
+      case "password":
+        if (value.length < 6) {
+          return "Password must be at least 6 characters.";
+        }
+        break;
+      default:
+        return "";
+    }
+    return ""; // No error
   };
 
-  const validateFields = () => {
-    let errors = {};
-    if (!/\S+@\S+\.\S+/.test(formData.email))
-      errors.email = "Please enter a valid email address.";
-    if (formData.username.length < 3)
-      errors.username = "Username must be at least 3 characters long.";
-    if (formData.password.length < 6)
-      errors.password = "Password must be at least 6 characters.";
-    return errors;
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value.trim() });
+
+    // Validate field dynamically
+    const error = validateField(id, value.trim());
+    setErrorMsg({ ...errorMsg, [id]: error });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errors = validateFields();
-    if (Object.keys(errors).length > 0) return setErrorMsg(errors);
+    const errors = {
+      email: validateField("email", formData.email),
+      username: validateField("username", formData.username),
+      password: validateField("password", formData.password),
+    };
+
+    // Check if there are any errors
+    if (Object.values(errors).some((err) => err)) {
+      setErrorMsg(errors);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -56,7 +87,6 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 p-5">
-      {/* <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-200 via-yellow-100 to-white bg-[length:200%_200%] animate-gradient p-5"> */}
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
         {/* Logo */}
         <Link
@@ -73,64 +103,70 @@ export default function SignUp() {
         <form className="space-y-3" onSubmit={handleSubmit}>
           <div>
             <Label value="Email" />
-            <TextInput
+            <input
               type="text"
               placeholder="Enter your email"
               id="email"
               value={formData.email}
               onChange={handleChange}
-              className={`${
-                errorMsg.email ? "border-red-500 focus:ring-red-500" : ""
-              }`}
-              aria-invalid={!!errorMsg.email}
-              aria-live="polite"
+              className={`block w-full px-4 py-2 pr-10 text-gray-900 bg-gray-50 border ${
+                errorMsg.email
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300"
+              } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
             {errorMsg.email && (
-              <Alert color="failure" className="mt-2">
-                {errorMsg.email}
-              </Alert>
+              <p className="text-sm text-red-500 mt-1">{errorMsg.email}</p>
             )}
           </div>
 
           <div>
             <Label value="Username" />
-            <TextInput
+            <input
               type="text"
               placeholder="Choose a username"
               id="username"
               value={formData.username}
               onChange={handleChange}
-              className={`${
-                errorMsg.username ? "border-red-500 focus:ring-red-500" : ""
-              }`}
-              aria-invalid={!!errorMsg.username}
-              aria-live="polite"
+              className={`block w-full px-4 py-2 pr-10 text-gray-900 bg-gray-50 border ${
+                errorMsg.username
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300"
+              } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
             {errorMsg.username && (
-              <Alert color="failure" className="mt-2">
-                {errorMsg.username}
-              </Alert>
+              <p className="text-sm text-red-500 mt-1">{errorMsg.username}</p>
             )}
           </div>
 
-          <div>
+          <div className="relative">
             <Label value="Password" />
-            <TextInput
-              type="password"
+            <input
+              type={passwordVisible ? "text" : "password"}
               placeholder="Create a password"
               id="password"
               value={formData.password}
               onChange={handleChange}
-              className={`${
-                errorMsg.password ? "border-red-500 focus:ring-red-500" : ""
-              }`}
-              aria-invalid={!!errorMsg.password}
-              aria-live="polite"
+              className={`block w-full px-4 py-2 pr-10 text-gray-900 bg-gray-50 border ${
+                errorMsg.password
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300"
+              } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
+            <button
+              type="button"
+              className="absolute top-9 right-3 flex items-center justify-center text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setPasswordVisible(!passwordVisible)}
+              aria-label={passwordVisible ? "Hide password" : "Show password"}
+            >
+              {passwordVisible ? (
+                <HiEyeOff className="w-5 h-5" />
+              ) : (
+                <HiEye className="w-5 h-5" />
+              )}
+            </button>
             {errorMsg.password && (
-              <Alert color="failure" className="mt-2">
-                {errorMsg.password}
-              </Alert>
+              <p className="text-sm text-red-500 mt-1">{errorMsg.password}</p>
             )}
           </div>
 

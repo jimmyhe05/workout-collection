@@ -2,19 +2,24 @@ import { IoIosFitness } from "react-icons/io";
 import { Label, TextInput, Button, Alert, Spinner } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
     login: "", // For email or username
     password: "",
   });
-  const [errorMsg, setErrorMsg] = useState({});
-  const [loading, setLoading] = useState(false);
+  const { loading, error } = useSelector((state) => state.user); // Using Redux state for loading and error
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
-    setErrorMsg({ ...errorMsg, [e.target.id]: "" }); // Clear error on input change
   };
 
   const validateFields = () => {
@@ -29,10 +34,13 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateFields();
-    if (Object.keys(errors).length > 0) return setErrorMsg(errors);
+    if (Object.keys(errors).length > 0) {
+      dispatch(signInFailure(errors));
+      return;
+    }
 
     try {
-      setLoading(true);
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,13 +49,16 @@ export default function SignIn() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Login failed. Please try again.");
+        dispatch(
+          signInFailure(data.message || "Login failed. Please try again.")
+        );
+        return;
       }
-      setLoading(false);
-      navigate("/home"); // Redirect to the home page
+
+      dispatch(signInSuccess(data));
+      navigate("/"); // Redirect to the home page
     } catch (err) {
-      setErrorMsg({ form: err.message });
-      setLoading(false);
+      dispatch(signInFailure(err.message));
     }
   };
 
@@ -76,14 +87,14 @@ export default function SignIn() {
               value={formData.login}
               onChange={handleChange}
               className={`${
-                errorMsg.login ? "border-red-500 focus:ring-red-500" : ""
+                error?.login ? "border-red-500 focus:ring-red-500" : ""
               }`}
-              aria-invalid={!!errorMsg.login}
+              aria-invalid={!!error?.login}
               aria-live="polite"
             />
-            {errorMsg.login && (
+            {error?.login && (
               <Alert color="failure" className="mt-2">
-                {errorMsg.login}
+                {error.login}
               </Alert>
             )}
           </div>
@@ -97,14 +108,14 @@ export default function SignIn() {
               value={formData.password}
               onChange={handleChange}
               className={`${
-                errorMsg.password ? "border-red-500 focus:ring-red-500" : ""
+                error?.password ? "border-red-500 focus:ring-red-500" : ""
               }`}
-              aria-invalid={!!errorMsg.password}
+              aria-invalid={!!error?.password}
               aria-live="polite"
             />
-            {errorMsg.password && (
+            {error?.password && (
               <Alert color="failure" className="mt-2">
-                {errorMsg.password}
+                {error.password}
               </Alert>
             )}
           </div>
@@ -125,9 +136,9 @@ export default function SignIn() {
             )}
           </Button>
 
-          {errorMsg.form && (
+          {error?.form && (
             <Alert color="failure" className="mt-3">
-              {errorMsg.form}
+              {error.form}
             </Alert>
           )}
         </form>

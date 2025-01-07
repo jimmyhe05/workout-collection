@@ -67,18 +67,30 @@ export const signin = async (req, res) => {
   }
 
   try {
-    // Check if the user exists by email or username
-    const validUser = await User.findOne({
-      $or: [{ email: login }, { username: login }],
-    });
-    if (!validUser) {
-      return errorResponse(res, 404, "User not found.");
-    }
+    // Detect if input is email or username
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(login);
 
-    // Validate the password
-    const validPassword = await bcrypt.compare(password, validUser.password);
-    if (!validPassword) {
-      return errorResponse(res, 401, "Invalid credentials.");
+    // Find user by email or username
+    const validUser = await User.findOne({
+      $or: [
+        { email: isEmail ? login : null },
+        { username: !isEmail ? login : null },
+      ],
+    });
+
+    // Validate password if user exists
+    const isPasswordValid = validUser
+      ? await bcrypt.compare(password, validUser.password)
+      : false;
+
+    // Determine error message
+    const errorMessage = isEmail
+      ? "Invalid email or password."
+      : "Invalid username or password.";
+
+    // Return error response if validation fails
+    if (!validUser || !isPasswordValid) {
+      return res.status(401).json({ message: errorMessage });
     }
 
     // Ensure JWT secret exists

@@ -47,10 +47,14 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+      // console.log(data);
+      // console.log(res);
 
       if (!res.ok) {
         dispatch(
-          signInFailure(data.message || "Login failed. Please try again.")
+          signInFailure({
+            form: data.message || "Sign-in failed. Please try again.",
+          })
         );
         return;
       }

@@ -15,23 +15,26 @@ export default function SignIn() {
     login: "", // For email or username
     password: "",
   });
+
   const { loading, error } = useSelector((state) => state.user); // Using Redux state for loading and error
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
 
+
   const validateFields = () => {
     let errors = {};
-    if (formData.login.trim() === "")
-      errors.login = "Please enter your email or username.";
+    if (!formData.login) errors.login = "Please enter your email or username.";
     if (formData.password.length < 6)
       errors.password = "Password must be at least 6 characters.";
     return errors;
   };
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateFields();
@@ -48,8 +51,6 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      // console.log(data);
-      // console.log(res);
 
       if (!res.ok) {
         dispatch(

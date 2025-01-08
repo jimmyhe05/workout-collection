@@ -3,6 +3,7 @@ import { Label, TextInput, Button, Alert, Spinner } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -185,6 +186,7 @@ export default function SignUp() {
               "Join Now"
             )}
           </Button>
+          <OAuth />
 
           {errorMsg.form && (
             <Alert color="failure" className="mt-3">

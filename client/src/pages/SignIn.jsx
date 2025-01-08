@@ -8,6 +8,7 @@ import {
   signInSuccess,
   signInFailure,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -139,6 +140,7 @@ export default function SignIn() {
               "Log In"
             )}
           </Button>
+          <OAuth />
 
           {error?.form && (
             <Alert color="failure" className="mt-3">
@@ -150,7 +152,7 @@ export default function SignIn() {
         {/* Footer */}
         <div className="mt-4 text-center">
           <p className="text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link to="/sign-up" className="text-blue-500 hover:underline">
               Sign Up
             </Link>

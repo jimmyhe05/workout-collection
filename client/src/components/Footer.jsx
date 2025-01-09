@@ -83,7 +83,6 @@ export default function FooterCom() {
           </div>
         </div>
 
-        {/* Divider */}
         <Footer.Divider className="border-gray-400" />
 
         {/* Bottom Section */}

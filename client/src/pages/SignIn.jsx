@@ -62,7 +62,7 @@ export default function SignIn() {
       }
 
       dispatch(signInSuccess(data));
-      navigate("/"); // Redirect to the home page
+      navigate("/");
     } catch (err) {
       dispatch(signInFailure(err.message));
     }

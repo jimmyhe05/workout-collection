@@ -40,7 +40,7 @@ export default function SignUp() {
       default:
         return "";
     }
-    return ""; // No error
+    return "";
   };
 
   const handleChange = (e) => {
@@ -60,7 +60,6 @@ export default function SignUp() {
       password: validateField("password", formData.password),
     };
 
-    // Check if there are any errors
     if (Object.values(errors).some((err) => err)) {
       setErrorMsg(errors);
       return;
@@ -89,7 +88,6 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 p-5">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        {/* Logo */}
         <Link
           to="/"
           className="flex justify-center items-center text-2xl font-bold mb-5"
@@ -195,7 +193,6 @@ export default function SignUp() {
           )}
         </form>
 
-        {/* Footer */}
         <div className="mt-4 text-center">
           <p className="text-sm">
             Already have an account?{" "}
